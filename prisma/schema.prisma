@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model habits {
+  id            String          @id @default(uuid())
+  title         String
+  created_at    DateTime
+  dayHabits     dayHabits[]
+  habitWeekDays habitWeekDays[]
+}
+
+model habitWeekDays {
+  id       String @id @default(uuid())
+  habit_id String
+  week_day Int
+
+  habit    habits @relation(fields: [habit_id], references: [id])
+
+  @@unique([habit_id, week_day])
+}
+
+model days {
+  id        String      @id @default(uuid())
+  date      DateTime
+  dayHabits dayHabits[]
+
+  @@unique([date])
+}
+
+model dayHabits {
+  id String @id @default(uuid())
+
+  day_id   String
+  habit_id String
+
+  day   days   @relation(fields: [day_id], references: [id])
+  habit habits @relation(fields: [habit_id], references: [id])
+
+  @@unique([day_id, habit_id])
+}
